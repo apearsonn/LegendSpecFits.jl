@@ -1,13 +1,25 @@
 """
-    fit_calibration(n_poly::Int, µ::AbstractVector{<:Union{Real,Measurement{<:Real}}}, peaks::AbstractVector{<:Union{Real,Measurement{<:Real}}}; pull_t::Vector{<:NamedTuple}=fill(NamedTuple(), n_poly+1), v_init::Vector = [], uncertainty::Bool=true )
+    fit_calibration(n_poly::Int, µ::AbstractVector{<:Union{Unitful.RealOrRealQuantity,Measurement{<:Unitful.RealOrRealQuantity}}}, peaks::AbstractVector{<:Quantity}; e_expression::Union{Symbol, String}="e", uncertainty::Bool=true)
 Fit the calibration lines with polynomial function of n_poly order
     n_poly == 1 -> linear function
     n_poly == 2 -> quadratic function
+
+# Arguments
+    * 'n_poly': Polynomial function order
+    * 'µ': Mean values 
+    * 'peaks': Data peaks
+
+# Keywords
+    * 'e_expression': Energy expression
+    * 'uncertainty': Fit uncertainty
+
 # Returns
     * `result`: NamedTuple with the following fields
         * `par`: best-fit parameters
-        * `gof`: godness of fit
+        * `gof`: goodness of fit
     * `report`: 
+
+TO DO: add description for 'report' return and arguments. 
 """
 function fit_calibration(n_poly::Int, µ::AbstractVector{<:Union{Unitful.RealOrRealQuantity,Measurement{<:Unitful.RealOrRealQuantity}}}, peaks::AbstractVector{<:Quantity}; e_expression::Union{Symbol, String}="e", uncertainty::Bool=true)
     @assert length(peaks) == length(μ)

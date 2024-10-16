@@ -6,6 +6,12 @@ Calculate the ratio of the FWHM and the peak height of the peak around `peak` in
 `e` with a cut window of `window`. The drift time dependence is given by
 `e_ctc` = `e` + `fct` * `qdrift`.
 
+# Arguments
+    * 'fct': Correction factor
+    * 'e': Calibrated energies
+    * 'qdrift': Charge drift
+    * 'bin_width': Width of histogram bins
+
 # Returns 
     * `fwhm / p_height`: FWHM of the peak divided by peak height
 """
@@ -24,11 +30,21 @@ function f_optimize_ctc(fct, e, qdrift, bin_width)
 end
 
 """
-    ctc_energy(e::Array{T}, qdrift::Array{T}, peak::T, window::T) where T<:Real
+    ctc_energy(e::Vector{<:Unitful.Energy{<:Real}}, qdrift::Vector{<:Real}, peak::Unitful.Energy{<:Real}, window::Tuple{<:Unitful.Energy{<:Real}, <:Unitful.Energy{<:Real}}, m_cal_simple::Unitful.Energy{<:Real}=1.0u"keV"; e_expression::Union{Symbol, String}="e")
 
 Correct for the drift time dependence of the energy by minimizing the ratio of
 the FWHM and the peak height of the peak around `peak` in `e` with a cut window
 of `window`. The drift time dependence is given by `qdrift`.
+
+# Arguments
+    * 'e': Calibrated energies
+    * 'qdrift': Drift time dependence 
+    * 'peak': Energy at the peak
+    * 'window': Data window in energy
+    * 'm_cal_simple': 
+
+# Keywords
+    * 'e_expression': Calibrated energy expression
 
 # Returns 
     * `peak`: peak position
@@ -38,7 +54,9 @@ of `window`. The drift time dependence is given by `qdrift`.
     * `fwhm_after`: FWHM after correction
     * `func`: function to correct energy
     * `func_generic`: generic function to correct energy
+
 """
+
 function ctc_energy(e::Vector{<:Unitful.Energy{<:Real}}, qdrift::Vector{<:Real}, peak::Unitful.Energy{<:Real}, window::Tuple{<:Unitful.Energy{<:Real}, <:Unitful.Energy{<:Real}}, m_cal_simple::Unitful.Energy{<:Real}=1.0u"keV"; e_expression::Union{Symbol, String}="e")
     # create cut window around peak
     cut = peak - first(window) .< e .< peak + last(window)

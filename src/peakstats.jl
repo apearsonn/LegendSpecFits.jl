@@ -1,5 +1,5 @@
 """
-    estimate_single_peak_stats(h::Histogram, calib_type::Symbol=:th228)
+    estimate_single_peak_stats(h::Histogram,; calib_type::Symbol=:th228)
 
 Estimate statistics/parameters for a single peak in the given histogram `h`.
 
@@ -8,6 +8,12 @@ shape.
 `calib_type` specifies the calibration type. Currently only `:th228` is implemented.
 If you want get the peak statistics for a PSD calibration, use `:psd`.
 
+# Arguments
+    * 'h': Histogram data
+
+# Keywords
+    * 'calib_type': Calibration type
+
 # Returns 
 `NamedTuple` with the fields
     * `peak_pos`: estimated position of the peak (in the middle of the peak)
@@ -15,6 +21,10 @@ If you want get the peak statistics for a PSD calibration, use `:psd`.
     * `peak_sigma`: estimated standard deviation of the peak
     * `peak_counts`: estimated number of counts in the peak
     * `mean_background`: estimated mean background value
+    * 'mean_background_step': estimated mean background step value
+    * 'mean_background_std': estimated mean background standard deviation
+
+ 
 """
 function estimate_single_peak_stats(h::Histogram,; calib_type::Symbol=:th228)
     if calib_type == :th228
@@ -26,6 +36,25 @@ function estimate_single_peak_stats(h::Histogram,; calib_type::Symbol=:th228)
     end
 end
 export estimate_single_peak_stats
+
+"""
+    estimate_single_peak_stats_th228(h::Histogram{T}) where T<:Real
+
+Estimate statistics/parameters for a single peak in the given histogram `h` for Th228 calibration.
+
+# Arguments
+    * 'h': Histogram data
+
+# Returns 
+`NamedTuple` with the fields
+    * `peak_pos`: estimated position of the peak (in the middle of the peak)
+    * `peak_fwhm`: full width at half maximum (FWHM) of the peak
+    * `peak_sigma`: estimated standard deviation of the peak
+    * `peak_counts`: estimated number of counts in the peak
+    * `mean_background`: estimated mean background value
+    * 'mean_background_step': estimated mean background step value
+    * 'mean_background_std': estimated mean background standard deviation
+"""
 
 function estimate_single_peak_stats_th228(h::Histogram{T}) where T<:Real
     W = h.weights
@@ -84,6 +113,23 @@ function estimate_single_peak_stats_th228(h::Histogram{T}) where T<:Real
         mean_background_std = mean_background_std,
     )
 end
+
+"""
+    estimate_single_peak_stats_psd(h::Histogram{T}) where T<:Real
+
+Estimate statistics/parameters for a single peak in the given histogram `h` for psd calibration.
+
+# Arguments
+    * 'h': Histogram data
+
+# Returns
+    * 'peak_pos': estimated position of the peak (in the middle of the peak)
+    * 'peak_fwhm': full width at half maximum (FWHM) of the peak
+    * 'peak_sigma': estimated standard deviation of the peak
+    * 'peak_counts': estimated number of counts in the peak
+    * mean_background': estimated mean background value
+"""
+
 
 function estimate_single_peak_stats_psd(h::Histogram{T}) where T<:Real
     W = h.weights

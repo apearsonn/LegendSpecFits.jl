@@ -1,13 +1,26 @@
 # This file is a part of LegendSpecFits.jl, licensed under the MIT License (MIT).
 
 """
-    fit_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, σ::Number, ps::NamedTuple; uncertainty::Bool=true)
+    fit_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, σ::Number, ps::NamedTuple; fit_func::Symbol = :f_fit, background_center::Union{Real,Nothing} = μ, uncertainty::Bool=false)
 
 Fit a single A/E Compton band using the `f_aoe_compton` function consisting of a gaussian SSE peak and a step like background for MSE events using fixed values for μ and σ.
+
+# Arguments
+    * 'h': Histogram
+    * 'μ': Mean values
+    * 'σ': Sigma values
+    * 'ps': Peak statistics
+    
+# Keywords
+    * 'fit_func': Fit function
+    * 'background_center': Center of the background fit curve
+    * 'uncertainty': Uncertainty of parameters
 
 # Returns
     * `neg_log_likelihood`: The negative log-likelihood of the likelihood fit
     * `report`: Dict of NamedTuples of the fit report which can be plotted for each compton band
+    * 'result': 
+
 """
 function fit_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, σ::Number, ps::NamedTuple; fit_func::Symbol = :f_fit, background_center::Union{Real,Nothing} = μ, uncertainty::Bool=false)
     
@@ -102,6 +115,27 @@ function fit_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, �
     return result, report
 end
 
+"""
+    neg_log_likelihood_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, σ::Number, ps::NamedTuple; fit_func::Symbol = :f_fit, background_center::Union{Real,Nothing} = μ, uncertainty::Bool=false)
+
+Fit a single A/E Compton band using the `f_aoe_compton` function consisting of a gaussian SSE peak and a step like background for MSE events using fixed values for μ and σ, returns value of the negative log-likelihood. 
+
+# Arguments
+    * 'h': Histogram data
+    * 'μ': Mean values
+    * 'σ': Sigma values
+    * 'ps': Peak statistics
+
+# Keywords
+    * 'fit_func': Fit function
+    * 'background_center': enter of the background fit curve
+    * 'uncertainty': Uncertainty of negative log-likelihood
+
+# Returns
+    * 'Optim.minimum(opt_r)':
+
+"""
+
 # This function calculates the same thing as fit_single_aoe_compton_with_fixed_μ_and_σ, but just returns the value of the negative log-likelihood
 function neg_log_likelihood_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram, μ::Number, σ::Number, ps::NamedTuple; fit_func::Symbol = :f_fit, background_center::Union{Real,Nothing} = μ, uncertainty::Bool=false)
     
@@ -133,16 +167,31 @@ function neg_log_likelihood_single_aoe_compton_with_fixed_μ_and_σ(h::Histogram
 end
 
 """
-    fit_aoe_compton_combined(peakhists::Vector{<:Histogram}, peakstats::StructArray, compton_bands::Array{T}, result_corrections::NamedTuple; pars_aoe::NamedTuple{(:μ, :μ_err, :σ, :σ_err)}=NamedTuple{(:μ, :μ_err, :σ, :σ_err)}(nothing, nothing, nothing, nothing), uncertainty::Bool=false) where T<:Unitful.Energy{<:Real}
+    fit_aoe_compton_combined(peakhists::Vector{<:Histogram}, peakstats::StructArray, compton_bands::Array{T}, result_corrections::NamedTuple; 
+    fit_func::Symbol = :f_fit, aoe_expression::Union{String,Symbol}="a / e", e_expression::Union{String,Symbol}="e", uncertainty::Bool=false) where T<:Unitful.Energy{<:Real}
 
-Performed a combined fit over all A/E Compton band using the `f_aoe_compton` function consisting of a gaussian SSE peak and a step like background for MSE events,
+Performed a combined fit over all A/E Compton bands using the `f_aoe_compton` function consisting of a gaussian SSE peak and a step like background for MSE events,
 assuming `f_aoe_mu` for `μ` and `f_aoe_sigma` for `σ`.
+
+# Arguments
+    * 'peakhists': Range of values of the histogram peak
+    * 'peakstats': Peak statistics
+    * 'compton_bands': Compton bands 
+    * 'result_corrections': Fit corrections
+
+# Keywords
+    * 'fit_func': Fit function name
+    * 'aoe_expression': A/E expression
+    * 'e_expression': Calibrated energy expression
+    * 'Uncertainty': Uncertainty of A/E compton band
 
 # Returns
     * `v_ml`: The fit result from the maximum-likelihood fit.
     * `report_μ`: Report to plot the combined fit result for the enery-dependence of `μ`.
     * `report_σ`: Report to plot the combined fit result for the enery-dependence of `σ`.
     * `report_bands`: Dict of NamedTuples of the fit report which can be plotted for each compton band
+
+
 """
 function fit_aoe_compton_combined(peakhists::Vector{<:Histogram}, peakstats::StructArray, compton_bands::Array{T}, result_corrections::NamedTuple; 
     fit_func::Symbol = :f_fit, aoe_expression::Union{String,Symbol}="a / e", e_expression::Union{String,Symbol}="e", uncertainty::Bool=false) where T<:Unitful.Energy{<:Real}
